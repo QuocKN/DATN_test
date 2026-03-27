@@ -1,1 +1,9 @@
 Spectrograms/
+browser.py
+test.html
+knn_model.joblib
+scaler.joblib
+svm_model.joblib
+confusion_matrix.png
+X.npy
+y.npy

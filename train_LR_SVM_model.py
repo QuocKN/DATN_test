@@ -1,8 +1,10 @@
 import numpy as np
+import joblib
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import classification_report, accuracy_score
 
 import matplotlib.pyplot as plt
@@ -24,19 +26,21 @@ X_test = scaler.transform(X_test)
 # # ========================
 # # 1. Logistic Regression
 # # ========================
-# logistic = LogisticRegression(max_iter=1000)
-# logistic.fit(X_train, y_train)
+logistic = LogisticRegression(max_iter=1000)
+logistic.fit(X_train, y_train)
 
-# y_pred_log = logistic.predict(X_test)
+y_pred_log = logistic.predict(X_test)
 
-# print("=== Logistic Regression ===")
-# print("Accuracy:", accuracy_score(y_test, y_pred_log))
-# print(classification_report(y_test, y_pred_log))
+print("=== Logistic Regression ===")
+print("Accuracy:", accuracy_score(y_test, y_pred_log))
+print(classification_report(y_test, y_pred_log))
 
 # ========================
 # 2. SVM
 # ========================
-svm = SVC(kernel='rbf')
+# svm = SVC(kernel='rbf')
+# tunning
+svm = SVC(kernel='rbf', C=10, gamma='scale', probability=True)
 svm.fit(X_train, y_train)
 
 y_pred_svm = svm.predict(X_test)
@@ -45,17 +49,52 @@ print("=== SVM ===")
 print("Accuracy:", accuracy_score(y_test, y_pred_svm))
 print(classification_report(y_test, y_pred_svm))
 
+# ========================
+# 3. KNN
+# ========================
+# knn = KNeighborsClassifier(n_neighbors=5)  # k = 5
+# tunning
+knn = KNeighborsClassifier(n_neighbors=7, weights='distance')
+knn.fit(X_train, y_train)
+
+y_pred_knn = knn.predict(X_test)
+
+print("=== KNN ===")
+print("Accuracy:", accuracy_score(y_test, y_pred_knn))
+print(classification_report(y_test, y_pred_knn))
+
+# Save artifacts for later inference on a single spectrogram image.
+joblib.dump(scaler, "scaler.joblib")
+joblib.dump(svm, "svm_model.joblib")
+joblib.dump(knn, "knn_model.joblib")
+
+print("Saved: scaler.joblib, svm_model.joblib, knn_model.joblib")
+
 # Confusion Matrix
-cm = confusion_matrix(y_test, y_pred_svm)
+# cm = confusion_matrix(y_test, y_pred_knn)
 
-labels = ["Noise", "Drone"]
+# labels = ["Noise", "Drone"]
 
-disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=labels)
-disp.plot(cmap="Blues", values_format='d')
+# disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=labels)
+# disp.plot(cmap="Blues", values_format='d')
 
-plt.title("Confusion Matrix (SVM + DINOv2)")
-plt.xlabel("Predicted Label")
-plt.ylabel("True Label")
+# plt.title("Confusion Matrix (KNN + DINOv2)")
+# plt.xlabel("Predicted Label")
+# plt.ylabel("True Label")
 
-plt.savefig("confusion_matrix.png", dpi=300)  # lưu ảnh chất lượng cao
-plt.show()
+# plt.savefig("confusion_matrix_knn.png", dpi=300)
+# plt.show()
+# Confusion Matrix
+# cm = confusion_matrix(y_test, y_pred_svm)
+
+# labels = ["Noise", "Drone"]
+
+# disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=labels)
+# disp.plot(cmap="Blues", values_format='d')
+
+# plt.title("Confusion Matrix (SVM + DINOv2)")
+# plt.xlabel("Predicted Label")
+# plt.ylabel("True Label")
+
+# plt.savefig("confusion_matrix.png", dpi=300)  # lưu ảnh chất lượng cao
+# plt.show()
