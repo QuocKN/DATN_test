@@ -7,3 +7,7 @@ svm_model.joblib
 confusion_matrix.png
 X.npy
 y.npy
+BLUE/
+BOTH/
+CLEAN/
+WIFI/
